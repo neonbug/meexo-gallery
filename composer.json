@@ -1,0 +1,18 @@
+{
+	"name": "neonbug/meexo-gallery",
+	"description": "Gallery package for Meexo CMS",
+	"keywords": ["meexo", "cms", "laravel", "php"],
+	"license": "MIT",
+	"type": "library",
+	"require": {
+		"neonbug/meexo": "*", 
+		"neonbug/meexo-common": "*", 
+		"bkwld/croppa": "~4.0",
+		"flowjs/flow-php-server": "dev-master"
+	},
+	"autoload": {
+		"psr-4": {
+			"Neonbug\\Gallery\\": "src"
+		}
+	}
+}
