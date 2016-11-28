@@ -270,6 +270,7 @@ class AdminController extends \Neonbug\Common\Http\Controllers\BaseAdminControll
 	
 	public function processGalleryImages($gallery_images, $id_item)
 	{
+		if ($gallery_images == null || sizeof($gallery_images) == 0) return;
 		$c = 1;
 		foreach ($gallery_images as $id_language=>$fields)
 		{
