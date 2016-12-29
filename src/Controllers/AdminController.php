@@ -137,9 +137,14 @@ class AdminController extends \Neonbug\Common\Http\Controllers\BaseAdminControll
 			$this->getRoutePrefix()
 		);
 		
+		$languages = App::make('LanguageRepository')->getAll();
+		
 		$this->processGalleryImages(
 			Request::input('gallery_image'), //first level keys are language ids, second level are field names
-			$id
+			$id, 
+			config($this->getConfigPrefix() . '.add.language_independent_fields'), 
+			config($this->getConfigPrefix() . '.add.language_dependent_fields'), 
+			$languages
 		);
 		
 		return $retval;
@@ -268,9 +273,72 @@ class AdminController extends \Neonbug\Common\Http\Controllers\BaseAdminControll
 		}
 	}
 	
-	public function processGalleryImages($gallery_images, $id_item)
+	public function processGalleryImages($gallery_images, $id_item, 
+		$language_independent_fields, $language_dependent_fields, $languages)
 	{
-		if ($gallery_images == null || sizeof($gallery_images) == 0) return;
+		if ($gallery_images == null)
+		{
+			$gallery_images = [];
+		}
+		
+		// fill in missing fields
+		foreach ([
+				'independent' => $language_independent_fields, 
+				'dependent' => $language_dependent_fields
+			] as $type=>$fields)
+		{
+			foreach ($fields as $field)
+			{
+				if ($field['type'] == 'gallery_admin::add_fields.gallery_images')
+				{
+					//find if field is present in $gallery_images
+					if ($type == 'independent')
+					{
+						$found = false;
+						if (array_key_exists(-1, $gallery_images))
+						{
+							foreach ($gallery_images as $id_language=>$selected_fields)
+							{
+								if (array_key_exists($field['name'], $selected_fields))
+								{
+									$found = true;
+									break;
+								}
+							}
+						}
+						
+						if (!$found)
+						{
+							$gallery_images[-1][$field['name']] = [ 'images' => [] ];
+						}
+					}
+					else if ($type == 'dependent')
+					{
+						foreach ($languages as $language)
+						{
+							$found = false;
+							if (array_key_exists($language->id_language, $gallery_images))
+							{
+								foreach ($gallery_images as $id_language=>$selected_fields)
+								{
+									if (array_key_exists($field['name'], $selected_fields))
+									{
+										$found = true;
+										break;
+									}
+								}
+							}
+							
+							if (!$found)
+							{
+								$gallery_images[$language->id_language][$field['name']] = [ 'images' => [] ];
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		$c = 1;
 		foreach ($gallery_images as $id_language=>$fields)
 		{
