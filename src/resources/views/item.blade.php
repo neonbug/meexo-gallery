@@ -44,6 +44,11 @@ $images = Neonbug\Gallery\Models\GalleryImage::where('id_row', $item->{$item->ge
 		<?php
 		$image_path = implode('/', [ $root_dir, $package_name, $id_gallery, $id_language, $column_name, $image->image ]);
 		
+		if (!file_exists($image_path))
+		{
+			continue;
+		}
+		
 		$url   = Croppa::url($image_path);
 		$thumb = Croppa::url($image_path, 180, 120);
 		?>
