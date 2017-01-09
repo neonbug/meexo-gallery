@@ -57,9 +57,14 @@ class AdminController extends \Neonbug\Common\Http\Controllers\BaseAdminControll
 		
 		$id_item = $item->{$item->getKeyName()};
 		
+		$languages = App::make('LanguageRepository')->getAll();
+		
 		$this->processGalleryImages(
 			Request::input('gallery_image'), //first level keys are language ids, second level are field names
-			$id_item
+			$id_item, 
+			config($this->getConfigPrefix() . '.add.language_independent_fields'), 
+			config($this->getConfigPrefix() . '.add.language_dependent_fields'), 
+			$languages
 		);
 		
 		return $retval;
