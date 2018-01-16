@@ -23,8 +23,13 @@
 				<div class="ui cards gallery-images-list">
 					@if ($item != null)
 						@foreach ($item->gallery_images[$id_language][$field['name']] as $image)
-							@include('gallery_admin::add_fields.gallery_images-image', [ 'item' => $item, 
-								'image' => $image->image, 'field' => $field, 'id_language' => $id_language ])
+							@include('gallery_admin::add_fields.gallery_images-image', [
+								'item'        => $item, 
+								'model_name'  => $model_name, 
+								'image'       => $image->image, 
+								'field'       => $field, 
+								'id_language' => $id_language
+							])
 						@endforeach
 					@endif
 				</div>

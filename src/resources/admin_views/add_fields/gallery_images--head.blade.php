@@ -10,10 +10,12 @@ var trans = {
 };
 
 var config = {
-	upload_gallery_file_route: {!! json_encode(route('gallery::admin::upload-gallery-file', [ 'UPLOAD_DIR' ])) !!}, 
-	temp_small_image_template_url: {!! json_encode(Croppa::url('uploads/gallery/temp/{UPLOAD_DIR}/{FILENAME}.{EXT}', 
+	upload_gallery_file_route: {!! json_encode(route($prefix . '::admin::upload-gallery-file', [ 'UPLOAD_DIR' ])) !!}, 
+	temp_small_image_template_url: {!! json_encode(Croppa::url('uploads/' . 
+		$model_name::getUploadsFolderNameForGalleryImages() . '/temp/{UPLOAD_DIR}/{FILENAME}.{EXT}', 
 		180, 120)) !!}, 
-	temp_image_template_url: {!! json_encode(Croppa::url('uploads/gallery/temp/{UPLOAD_DIR}/{FILENAME}.{EXT}')) !!}
+	temp_image_template_url: {!! json_encode(Croppa::url('uploads/' . 
+		$model_name::getUploadsFolderNameForGalleryImages() . '/temp/{UPLOAD_DIR}/{FILENAME}.{EXT}')) !!}
 };
 
 gallery_images.init(trans, config);

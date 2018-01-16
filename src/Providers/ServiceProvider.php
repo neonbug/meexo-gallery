@@ -4,11 +4,13 @@ use App;
 use Route;
 use View;
 use Config;
+use Event;
 use \Illuminate\Routing\Router as Router;
 
 class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 	
 	use \Neonbug\Common\Traits\OrdTrait;
+	use \Neonbug\Gallery\Traits\GalleryImagesTrait;
 	
 	const PACKAGE_NAME     = 'gallery';
 	const PREFIX           = 'gallery';
@@ -133,17 +135,12 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 				'as'   => static::PREFIX . '::admin::check-slug', 
 				'uses' => static::ADMIN_CONTROLLER . '@adminCheckSlugPost'
 			]);
-			
-			$router->get('upload-gallery-file/{upload_dir}', [
-				'as'   => static::PREFIX . '::admin::upload-gallery-file-check', 
-				'uses' => static::ADMIN_CONTROLLER . '@adminUploadGalleryFile'
-			]);
-			
-			$router->post('upload-gallery-file/{upload_dir}', [
-				'as'   => static::PREFIX . '::admin::upload-gallery-file', 
-				'uses' => static::ADMIN_CONTROLLER . '@adminUploadGalleryFilePost'
-			]);
 		});
+		
+		//============
+		//== EVENTS ==
+		//============
+		Event::subscribe('\Neonbug\Gallery\Handlers\Events\GalleryImagesEventHandler');
 
 		parent::boot($router);
 	}
