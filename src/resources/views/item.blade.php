@@ -32,18 +32,17 @@ $package_name = 'gallery';
 $id_gallery   = $item->{$item->getKeyName()};
 $id_language  = 0; //language independent field
 $column_name  = 'images';
-
-$images = Neonbug\Gallery\Models\GalleryImage::where('id_row', $item->{$item->getKeyName()})
-	->where('column_name', $column_name)
-	->orderBy('ord')
-	->get();
 ?>
 
 <div class="gallery-images">
-	@foreach ($images as $image)
+	@foreach ($item->gallery_images as $image)
 		<?php
-		$image_path = implode('/', [ $root_dir, $package_name, $id_gallery, $id_language, $column_name, $image->image ]);
-		
+		$image_path = $image->getPath(
+			'gallery', 
+			'images', 
+			$item->{$item->getKeyName()}, 
+			0
+		);
 		if (!file_exists($image_path))
 		{
 			continue;

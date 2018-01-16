@@ -46,6 +46,14 @@ class Controller extends \App\Http\Controllers\Controller {
 				App::make('ResourceRepository')->inflateObjectWithValues($item, $language->id_language);
 			}
 			
+			$repo = App::make('\Neonbug\Gallery\Repositories\GalleryRepository');
+			$item->gallery_images = $repo->getImages(
+				'gallery', 
+				'images', 
+				$id, 
+				null
+			);
+			
 			return $item;
 		};
 		
