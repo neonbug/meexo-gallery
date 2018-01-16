@@ -88,9 +88,14 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 		});
 		
 		//admin
-		$router->group([ 'prefix' => $admin_locale . '/admin/' . static::PREFIX, 
-			'middleware' => [ 'auth.admin', 'admin.menu' ], 'role' => static::ROLE, 
-			'menu.icon' => 'photo' ], function($router)
+		$show_in_admin_menu = !Config::get('neonbug.' . static::PACKAGE_NAME . '.hide_from_admin_menu', false);
+		
+		$router->group([
+			'prefix'     => $admin_locale . '/admin/' . static::PREFIX, 
+			'middleware' => ($show_in_admin_menu ? [ 'auth.admin', 'admin.menu' ] : [ 'auth.admin' ]), 
+			'role'       => static::ROLE, 
+			'menu.icon'  => 'photo', 
+		], function($router)
 		{
 			$router->get('list', [
 				'as'   => static::PREFIX . '::admin::list', 

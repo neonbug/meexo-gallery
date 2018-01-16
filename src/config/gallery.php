@@ -2,6 +2,7 @@
 	
 	'model' => '\Neonbug\Gallery\Models\Gallery', 
 	'supports_preview' => false, 
+	'hide_from_admin_menu' => false, 
 	
 	'list' => [
 		'fields' => [
