@@ -80,6 +80,9 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 				$slugs = $resource_repo->getSlugs($language->id_language, static::TABLE_NAME);
 				foreach ($slugs as $slug)
 				{
+					// skip empty slugs
+					if ($slug->value == '') continue;
+					
 					$router->get($slug->value, [ 'as' => static::PREFIX . '::slug::' . $slug->value, 
 						function() use ($slug) {
 						$controller = App::make(static::CONTROLLER);
