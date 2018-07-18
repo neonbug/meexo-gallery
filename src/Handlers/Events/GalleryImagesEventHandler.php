@@ -20,7 +20,11 @@ class GalleryImagesEventHandler
 		$events->listen('Neonbug\Common\Events\AdminAddEditPrepareField', function($event) {
 			if ($event->item === null) return;
 			if (! $event->item instanceof \Neonbug\Gallery\Traits\GalleryImagesTraitInterface) return;
-			if ($event->field['type'] != 'gallery_admin::add_fields.gallery_images') return;
+			if ($event->field['type'] != 'gallery_admin::add_fields.gallery_images' && 
+				(!array_key_exists('handle_as', $event->field) || $event->field['handle_as'] != 'gallery_admin::add_fields.gallery_images'))
+			{
+				return;
+			}
 			
 			if (!isSet($event->item->gallery_images))
 			{
@@ -69,7 +73,8 @@ class GalleryImagesEventHandler
 			{
 				foreach ($fields as $field)
 				{
-					if ($field['type'] == 'gallery_admin::add_fields.gallery_images')
+					if ($field['type'] == 'gallery_admin::add_fields.gallery_images' || 
+						(array_key_exists('handle_as', $field) && $field['handle_as'] == 'gallery_admin::add_fields.gallery_images'))
 					{
 						//find if field is present in $gallery_images
 						if ($type == 'independent')
