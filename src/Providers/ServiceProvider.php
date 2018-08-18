@@ -149,6 +149,7 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 		//== EVENTS ==
 		//============
 		Event::subscribe('\Neonbug\Gallery\Handlers\Events\GalleryImagesEventHandler');
+		Event::subscribe('\Neonbug\Gallery\Handlers\Events\GalleryEventHandler');
 
 		parent::boot($router);
 	}

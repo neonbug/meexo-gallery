@@ -46,9 +46,39 @@
 	</a>
 	<div class="content">
 		<div class="description">
-			<span class="gallery-images-image-name">
+			<div class="gallery-images-image-name">
 				{{ $image == null ? '' : $image }}
-			</span>
+			</div>
+			
+			<?php
+			$data_fields = (array_key_exists('data_fields', $field) ? $field['data_fields'] : []);
+			if (sizeof($data_fields) > 0) {
+			?>
+				<div class="ui hidden divider"></div>
+				
+				<?php
+				foreach ($data_fields as $data_field_name=>$data_field_title)
+				{
+					$title = trans($data_field_title);
+					$name  = 'gallery_image_data[' . $field['name'] . '][' . $id_language . '][' . $data_field_name . '][]';
+					$value = ($idx !== null && $field !== null && $idx < sizeof($field['data']) && 
+									array_key_exists($data_field_name, $field['data'][$idx]) ? 
+									$field['data'][$idx][$data_field_name] : '');
+					
+					?>
+					<div>
+						<label>{{ $title }}</label>
+						<br />
+						<input type="text"
+							name="{{ $name }}"
+							value="{{ $value }}"
+							data-name="{{ $data_field_name }}"
+							class="gallery-images-image--data-field" />
+					</div>
+					<?php
+				}
+			}
+			?>
 		</div>
 	</div>
 	<div class="ui bottom attached red button 

@@ -69,7 +69,12 @@
 			[
 				'name' => 'images', 
 				'type' => 'gallery_admin::add_fields.gallery_images', 
-				'value' => ''
+				'value' => '', 
+				/*'save_to_field' => 'gallery_image_data', 
+				'data_fields' => [
+					'title' => 'gallery::admin.add_fields.gallery_images.data_fields.title', 
+				], 
+				'data' => [], */
 			]
 		]
 	], 
@@ -112,7 +117,12 @@
 			[
 				'name' => 'images', 
 				'type' => 'gallery_admin::add_fields.gallery_images', 
-				'value' => ''
+				'value' => '', 
+				/*'save_to_field' => 'gallery_image_data', 
+				'data_fields' => [
+					'title' => 'gallery::admin.add_fields.gallery_images.data_fields.title', 
+				], 
+				'data' => [], */
 			]
 		]
 	]
