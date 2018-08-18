@@ -37,4 +37,9 @@ class AdminController extends \Neonbug\Common\Http\Controllers\BaseAdminControll
 		trans($this->getPackageName() . '::admin.title.edit')
 	]; }
 	
+	public function adminListApi() {
+		$repo = App::make('\Neonbug\Gallery\Repositories\GalleryRepository');
+		return $repo->getListForDropdown();
+	}
+	
 }

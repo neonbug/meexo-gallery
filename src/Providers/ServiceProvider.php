@@ -138,6 +138,11 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 				'as'   => static::PREFIX . '::admin::check-slug', 
 				'uses' => static::ADMIN_CONTROLLER . '@adminCheckSlugPost'
 			]);
+			
+			$router->get('list-api', [
+				'as'   => static::PREFIX . '::admin::list-api', 
+				'uses' => static::ADMIN_CONTROLLER . '@adminListApi'
+			]);
 		});
 		
 		//============

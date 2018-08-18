@@ -76,6 +76,41 @@ class GalleryRepository {
 		return $items;
 	}
 	
+	public function getListForDropdown()
+	{
+		$model = $this->model;
+		
+		$latest_items = $model::orderBy('updated_at', 'DESC')
+			->limit(5)
+			->get();
+		$this->resource_repository->inflateObjectsWithValues($latest_items, $this->language->id_language);
+		
+		$all_items = $model::get();
+		$this->resource_repository->inflateObjectsWithValues($all_items, $this->language->id_language);
+		
+		$all_items_arr = $all_items->all();
+		usort($all_items_arr, function($a, $b) {
+			return strcasecmp($a->title, $b->title);
+		});
+		
+		$items = [];
+		foreach ($latest_items as $item)
+		{
+			$items[] = [ 'id_gallery' => $item->id_gallery, 'title' => $item->title ];
+		}
+		
+		if (sizeof($all_items_arr) > sizeof($latest_items))
+		{
+			$items[] = [ 'id_gallery' => -1, 'title' => '-------' ];
+			foreach ($all_items_arr as $item)
+			{
+				$items[] = [ 'id_gallery' => $item->id_gallery, 'title' => $item->title ];
+			}
+		}
+		
+		return $items;
+	}
+	
 	public function getImages($table_name, $column_name, $id_row, $id_language = null)
 	{
 		$query = \Neonbug\Gallery\Models\GalleryImage::where('table_name', $table_name)
