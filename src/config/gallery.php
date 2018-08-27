@@ -36,7 +36,8 @@
 			[
 				'name' => 'title', 
 				'type' => 'single_line_text', 
-				'value' => ''
+				'value' => '', 
+				'required' => true
 			], 
 			[
 				'name' => 'slug', 
@@ -54,7 +55,8 @@
 			[
 				'name' => 'main_image', 
 				'type' => 'image', 
-				'value' => ''
+				'value' => '', 
+				'required' => true
 			], 
 			[
 				'name' => 'published', 
@@ -84,7 +86,8 @@
 			[
 				'name' => 'title', 
 				'type' => 'single_line_text', 
-				'value' => ''
+				'value' => '', 
+				'required' => true
 			], 
 			[
 				'name' => 'slug', 
@@ -102,7 +105,8 @@
 			[
 				'name' => 'main_image', 
 				'type' => 'image', 
-				'value' => ''
+				'value' => '', 
+				'required' => true
 			], 
 			[
 				'name' => 'published', 
