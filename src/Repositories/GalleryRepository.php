@@ -131,4 +131,36 @@ class GalleryRepository {
 		return $images;
 	}
 	
+	public function replaceEmbeddedGalleries($contents, $view_callback)
+	{
+		$gallery_repo = $this;
+		$model        = $this->model;
+		$new_contents = $contents;
+		
+		$embed_gallery_regex = '/<div class="meexogallery-embed" data-id-gallery="(\d+)">.*<\/div>/';
+		preg_match_all($embed_gallery_regex, $new_contents, $embed_gallery_output);
+		if (sizeof($embed_gallery_output) > 0 && sizeof($embed_gallery_output[0]) > 0)
+		{
+			$new_contents = preg_replace_callback($embed_gallery_regex, function($match)
+				use ($gallery_repo, $model, $view_callback) {
+				$gallery = $model::where('id_gallery', $match[1])->first();
+				if ($gallery == null)
+				{
+					return '';
+				}
+				
+				$gallery_images = $gallery_repo->getImages(
+					'gallery', 
+					'images', 
+					$gallery->id_gallery, 
+					null
+				);
+				
+				return $view_callback($gallery, $gallery_images);
+			}, $new_contents);
+		}
+		
+		return $new_contents;
+	}
+	
 }
