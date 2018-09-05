@@ -36,7 +36,7 @@ function init()
 		});
 		
 		flow.on('fileAdded', function(file) {
-			var item = $($('#gallery-images-image-template').html())
+			var item = $($('.gallery-images-image-template', el).html())
 				.appendTo($('.gallery-images-list', el));
 			
 			item.get(0).dataset.id = file.uniqueIdentifier;
@@ -48,8 +48,12 @@ function init()
 				item.remove();
 			});
 			
-			reloadSortable();
-			scrollToBottom(el);
+			// reinit sortable
+			$('.gallery-images-list').sortable();
+			
+			// scroll to bottom
+			var list = $('.gallery-images-list', el);
+			list.scrollTop(list.height());
 		});
 		
 		flow.on('fileProgress', function(file) {
