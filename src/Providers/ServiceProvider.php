@@ -12,12 +12,13 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 	use \Neonbug\Common\Traits\OrdTrait;
 	use \Neonbug\Gallery\Traits\GalleryImagesTrait;
 	
-	const PACKAGE_NAME     = 'gallery';
-	const PREFIX           = 'gallery';
-	const ROLE             = 'gallery';
-	const TABLE_NAME       = 'gallery';
-	const CONTROLLER       = '\Neonbug\Gallery\Controllers\Controller';
-	const ADMIN_CONTROLLER = '\Neonbug\Gallery\Controllers\AdminController';
+	const PACKAGE_NAME       = 'gallery';
+	const PREFIX             = 'gallery';
+	const ROLE               = 'gallery';
+	const TABLE_NAME         = 'gallery';
+	const CONTROLLER         = '\Neonbug\Gallery\Controllers\Controller';
+	const ADMIN_CONTROLLER   = '\Neonbug\Gallery\Controllers\AdminController';
+	const FULL_CONFIG_PREFIX = 'packages.gallery';
 	
 	/**
 	 * Define your route model bindings, pattern filters, etc.
@@ -58,6 +59,7 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 		//== ROUTES ==
 		//============
 		$language = App::make('Language');
+		$languages = $language::all();
 		$locale = ($language == null ? Config::get('app.default_locale') : $language->locale);
 		
 		$admin_language = App::make('AdminLanguage');
@@ -66,31 +68,110 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 		$resource_repo = App::make('ResourceRepository');
 		
 		//frontend
-		$router->group([ 'middleware' => [ 'online' ], 'prefix' => $locale . '/' . 
-			trans(static::PACKAGE_NAME . '::frontend.route.prefix') ], 
-			function($router) use ($locale, $resource_repo, $language)
+		$slug_routes_at_root = Config::get(static::FULL_CONFIG_PREFIX . '.slug_routes_at_root', false);
+		
+		foreach ($languages as $language_item)
 		{
-			$router->get('/',             [ 'as' => static::PREFIX . '::index',   'uses' => static::CONTROLLER . '@index' ]);
-			$router->get('index',         [                                       'uses' => static::CONTROLLER . '@index' ]);
-			$router->get('item/{id}',     [ 'as' => static::PREFIX . '::item',    'uses' => static::CONTROLLER . '@item' ]);
-			$router->get('preview/{key}', [ 'as' => static::PREFIX . '::preview', 'uses' => static::CONTROLLER . '@preview' ]);
+			$slugs = 
+				$language_item == null ?
+					null : 
+					$resource_repo->getSlugs($language_item->id_language, static::TABLE_NAME);
 			
-			if ($language != null)
+			$router->group([ 'middleware' => [ 'online' ], 'prefix' => $language_item->locale ], 
+				function($router) use ($slugs, $slug_routes_at_root, $language_item, $locale)
 			{
-				$slugs = $resource_repo->getSlugs($language->id_language, static::TABLE_NAME);
-				foreach ($slugs as $slug)
+				$router->group([ 'prefix' => trans(static::PACKAGE_NAME . '::frontend.route.prefix', [], 'messages', $language_item->locale) ], 
+					function($router) use ($slugs, $slug_routes_at_root, $language_item, $locale)
 				{
-					// skip empty slugs
-					if ($slug->value == '') continue;
+					$lang_postfix = '::' . $language_item->locale;
+					$route_prefix = static::PACKAGE_NAME . '::frontend.route.';
 					
-					$router->get($slug->value, [ 'as' => static::PREFIX . '::slug::' . $slug->value, 
-						function() use ($slug) {
-						$controller = App::make(static::CONTROLLER);
-						return $controller->callAction('item', [ 'id' => $slug->id_row ]);
-					} ]);
+					/*
+					 * If language_item is current language, then we need to
+					 * create all routes twice - once with lang_postfix and once without.
+					 * Order matters - without language postfix should be at the end
+					 * to enable Route::currentRouteName to return this route, instead of
+					 * one of the routes with language postfix.
+					 */
+					$postfixes = 
+						$language_item->locale == $locale ? 
+							[ $lang_postfix, '' ] : 
+							[ $lang_postfix ];
+					
+					foreach ($postfixes as $postfix)
+					{
+						$router->get('/', [
+							'as'   => static::PREFIX . '::index' . $postfix, 
+							'uses' => static::CONTROLLER . '@index'
+						]);
+						$router->get('index', [
+							'as'   => static::PREFIX . '::index-with-name' . $postfix, 
+							'uses' => static::CONTROLLER . '@index'
+						]);
+						$router->get('item/{id}', [
+							'as'   => static::PREFIX . '::item' . $postfix, 
+							'uses' => static::CONTROLLER . '@item'
+						]);
+						$router->get('preview/{key}', [
+							'as'   => static::PREFIX . '::preview' . $postfix, 
+							'uses' => static::CONTROLLER . '@preview'
+						]);
+					}
+					
+					if ($slugs != null)
+					{
+						$this->setRoutesFromSlugs(
+							$router, 
+							$slugs, 
+							($slug_routes_at_root === true ? 'default' : ''), 
+							$language_item->locale
+						);
+						
+						/*
+						 * Order matters - route without language postfix should be at the end
+						 * to enable Route::currentRouteName to return this route, instead of
+						 * one of the routes with language postfix
+						 */
+						if ($language_item->locale == $locale) // current language
+						{
+							$this->setRoutesFromSlugs(
+								$router, 
+								$slugs, 
+								($slug_routes_at_root === true ? 'default' : '')
+							);
+						}
+					}
+				});
+
+				//put routes at root level (i.e. /en/contents/abc is also accessible via /en/abc)
+				if ($slug_routes_at_root)
+				{
+					if ($slugs != null)
+					{
+						$this->setRoutesFromSlugs(
+							$router, 
+							$slugs, 
+							'', 
+							$language_item->locale
+						);
+						
+						/*
+						 * Order matters - route without language postfix should be at the end
+						 * to enable Route::currentRouteName to return this route, instead of
+						 * one of the routes with language postfix
+						 */
+						if ($language_item->locale == $locale) // current language
+						{
+							$this->setRoutesFromSlugs(
+								$router, 
+								$slugs, 
+								''
+							);
+						}
+					}
 				}
-			}
-		});
+			});
+		}
 		
 		//admin
 		$show_in_admin_menu = !Config::get('neonbug.' . static::PACKAGE_NAME . '.hide_from_admin_menu', false);
@@ -152,6 +233,36 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 		Event::subscribe('\Neonbug\Gallery\Handlers\Events\GalleryEventHandler');
 
 		parent::boot($router);
+	}
+	
+	protected function setRoutesFromSlugs($router, $slugs, $route_name_prefix_postfix = '', $route_name_postfix = '')
+	{
+		$prefix_postfix = ($route_name_prefix_postfix == '' ? '' : '-' . $route_name_prefix_postfix);
+		$route_name_prefix = static::PREFIX . '::slug' . $prefix_postfix . '::';
+		
+		$postfix = ($route_name_postfix == '' ? '' : '::' . $route_name_postfix);
+		
+		foreach ($slugs as $slug)
+		{
+			// skip empty slugs
+			if ($slug->value == '') continue;
+			
+			/*
+			 * Order matters - route without language postfix should be at the end
+			 * to enable Route::currentRouteName to return this route, instead of
+			 * one of the routes with language postfix
+			 */
+			foreach ([
+				$route_name_prefix . $slug->value, 
+				$route_name_prefix . 'item-' . $slug->id_row . $postfix, 
+			] as $route_alias) {
+				$router->get($slug->value, [ 'as' => $route_alias, 
+					function() use ($slug) {
+					$controller = App::make(static::CONTROLLER);
+					return $controller->callAction('item', [ 'id' => $slug->id_row ]);
+				} ]);
+			}
+		}
 	}
 
 	/**
