@@ -13,7 +13,7 @@ class CreateGalleryImageTable extends Migration {
 		Schema::create('gallery_image', function(Blueprint $table)
 		{
 			$table->increments('id_gallery_image');
-			$table->integer('id_language')->nullable();
+			$table->integer('id_language')->unsigned()->nullable();
 			$table->string('table_name', 60);
 			$table->string('column_name', 60);
 			$table->string('image', 255);

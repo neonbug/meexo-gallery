@@ -3,6 +3,10 @@
 class Gallery extends \Neonbug\Common\Models\BaseModel implements \Neonbug\Common\Traits\OrdTraitInterface, 
 	\Neonbug\Gallery\Traits\GalleryImagesTraitInterface {
 	
+	protected $casts = [
+		'published' => 'boolean',
+	];
+	
 	public $gallery_images = []; // keys are id languages, then field names
 	public static function getTableNameForGalleryImages() { return 'gallery'; } // from GalleryImagesTraitInterface
 	public static function getUploadsFolderNameForGalleryImages() { return 'gallery'; } // from GalleryImagesTraitInterface
