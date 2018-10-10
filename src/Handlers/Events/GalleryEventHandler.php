@@ -49,6 +49,26 @@ class GalleryEventHandler
 				$event->fields['language_independent'][$i]['data'] = $value;
 			}
 		}
+		
+		$lang_dep_fields = $event->fields['language_dependent'];
+		foreach ($lang_dep_fields as $id_language=>$fields)
+		{
+			for ($i=0; $i<sizeof($fields); $i++)
+			{
+				$field = $fields[$i];
+				
+				if ($field['type'] == 'gallery_admin::add_fields.gallery_images')
+				{
+					$value = json_decode($field['value'], true);
+					if ($value === null)
+					{
+						$value = [];
+					}
+					
+					$event->fields['language_dependent'][$id_language][$i]['data'] = $value;
+				}
+			}
+		}
 	}
 	
 	protected function handleAddEditSavePreparedFields($event)
@@ -57,34 +77,41 @@ class GalleryEventHandler
 		$gallery_image_data = Request::input('gallery_image_data', []);
 		
 		$language_independent_fields = $event->all_language_independent_fields;
+		$language_dependent_fields   = $event->all_language_dependent_fields;
 		$fields = $event->fields;
 		
 		// translate arrays to json strings
-		for ($i=0; $i<sizeof($language_independent_fields); $i++)
+		foreach ([
+			$language_independent_fields, 
+			$language_dependent_fields, 
+		] as $lang_fields)
 		{
-			$field = $language_independent_fields[$i];
-			
-			if ($field['type'] == 'gallery_admin::add_fields.gallery_images')
+			for ($i=0; $i<sizeof($lang_fields); $i++)
 			{
-				foreach ($fields as $id_language=>$field_array)
+				$field = $lang_fields[$i];
+				
+				if ($field['type'] == 'gallery_admin::add_fields.gallery_images')
 				{
-					if (!array_key_exists($field['name'], $gallery_image_data) || 
-						!array_key_exists($id_language, $gallery_image_data[$field['name']]))
+					foreach ($fields as $id_language=>$field_array)
 					{
-						continue;
-					}
-					
-					// restructure data from [title][idx], [size][idx], [price][idx] -> [idx][title, size, price]
-					$restructured_data = [];
-					foreach ($gallery_image_data[$field['name']][$id_language] as $data_key=>$data_arr)
-					{
-						foreach ($data_arr as $idx=>$value)
+						if (!array_key_exists($field['name'], $gallery_image_data) || 
+							!array_key_exists($id_language, $gallery_image_data[$field['name']]))
 						{
-							$restructured_data[$idx][$data_key] = $value;
+							continue;
 						}
+						
+						// restructure data from [title][idx], [size][idx], [price][idx] -> [idx][title, size, price]
+						$restructured_data = [];
+						foreach ($gallery_image_data[$field['name']][$id_language] as $data_key=>$data_arr)
+						{
+							foreach ($data_arr as $idx=>$value)
+							{
+								$restructured_data[$idx][$data_key] = $value;
+							}
+						}
+						
+						$event->fields[$id_language][$field['save_to_field']] = json_encode($restructured_data);
 					}
-					
-					$event->item->{$field['save_to_field']} = json_encode($restructured_data);
 				}
 			}
 		}
