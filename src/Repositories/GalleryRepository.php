@@ -13,7 +13,7 @@ class GalleryRepository {
 	protected $language;
 	protected $resource_repository;
 	
-	public function __construct(Language $language, ResourceRepository $resource_repository)
+	public function __construct(Language $language = null, ResourceRepository $resource_repository = null)
 	{
 		$this->model = config(static::CONFIG_PREFIX . '.model');
 		
