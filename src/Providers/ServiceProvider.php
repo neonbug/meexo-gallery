@@ -18,7 +18,7 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 	const TABLE_NAME         = 'gallery';
 	const CONTROLLER         = '\Neonbug\Gallery\Controllers\Controller';
 	const ADMIN_CONTROLLER   = '\Neonbug\Gallery\Controllers\AdminController';
-	const FULL_CONFIG_PREFIX = 'packages.gallery';
+	const FULL_CONFIG_PREFIX = 'neonbug.gallery';
 	
 	/**
 	 * Define your route model bindings, pattern filters, etc.
