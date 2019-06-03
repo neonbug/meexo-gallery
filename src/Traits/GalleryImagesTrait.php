@@ -45,7 +45,7 @@ trait GalleryImagesTrait {
 		if (!file_exists($temp_dir))
 		{
 			// create dir, but suppress possible errors
-			// since we're checking for dir existance, errors should occur, but they do, 
+			// since we're checking for dir existance, errors should not occur, but they do, 
 			//    because of concurrent requests (request A notices this dir doesn't exist yet, 
 			//    but before it can create it, request B does so; so when request A tries to create it, 
 			//    it fails miserably)
@@ -72,7 +72,7 @@ trait GalleryImagesTrait {
 		if (!file_exists($temp_dir))
 		{
 			// create dir, but suppress possible errors
-			// since we're checking for dir existance, errors should occur, but they do, 
+			// since we're checking for dir existance, errors should not occur, but they do, 
 			//    because of concurrent requests (request A notices this dir doesn't exist yet, 
 			//    but before it can create it, request B does so; so when request A tries to create it, 
 			//    it fails miserably)
@@ -100,7 +100,7 @@ trait GalleryImagesTrait {
 			if (!file_exists($dir))
 			{
 				// create dir, but suppress possible errors
-				// since we're checking for dir existance, errors should occur, but they do, 
+				// since we're checking for dir existance, errors should not occur, but they do, 
 				//    because of concurrent requests (request A notices this dir doesn't exist yet, 
 				//    but before it can create it, request B does so; so when request A tries to create it, 
 				//    it fails miserably)
