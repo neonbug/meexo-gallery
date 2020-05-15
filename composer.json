@@ -7,7 +7,7 @@
 	"require": {
 		"neonbug/meexo-common": "^1.0", 
 		"bkwld/croppa": "~4.0",
-		"flowjs/flow-php-server": "dev-master"
+		"flowjs/flow-php-server": "^1.0.3"
 	},
 	"autoload": {
 		"psr-4": {
