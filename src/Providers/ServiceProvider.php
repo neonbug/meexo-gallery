@@ -223,6 +223,11 @@ class ServiceProvider extends \Neonbug\Common\Providers\BaseServiceProvider {
 				'as'   => static::PREFIX . '::admin::list-api', 
 				'uses' => static::ADMIN_CONTROLLER . '@adminListApi'
 			]);
+			
+			$router->post('save-item-order', [
+				'as'   => static::PREFIX . '::admin::save-item-order', 
+				'uses' => static::ADMIN_CONTROLLER . '@adminSaveItemOrderPost'
+			]);
 		});
 		
 		//============
